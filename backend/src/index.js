@@ -1,7 +1,9 @@
 const sqlite3 = require("sqlite3");
-const bodyParser = require("body-parser");
+const bodyParser = require('body-parser');
 const express = require('express');
 const validator = require('./validator');
+const dbTools = require('./db_alter');
+const tools = require('./tools');
 
 const db = new sqlite3.Database("data.db", sqlite3.OPEN_READWRITE, (err) => {
     if(err){
@@ -90,6 +92,16 @@ app.post("/api/problem/create", (req, res, next) => {
             return;
         }
 
+        if(tools.hasDuplicate(problemTags)){
+            res.status(400).send("problem tags has duplicates");
+            return;
+        }
+        
+        if(tools.hasDuplicate(contestTags)){
+            res.status(400).send("contest tags has duplicates");
+            return;
+        }
+
         // insert problem into database
         db.run("INSERT INTO Problems (author, title, statement, solution) VALUES (?, ?, ?, ?)", [author, title, statement, solution], function(err) {
             if(err) throw err;
@@ -114,7 +126,7 @@ app.post("/api/problem/create", (req, res, next) => {
                 }, [])
                 db.run(sql, args, (err) => {
                     if(err) throw err;
-                    res.status(201).json({'id': pId});
+                    res.status(200).json({'id': pId});
                 })
             })
         })
@@ -125,6 +137,68 @@ app.post("/api/problem/create", (req, res, next) => {
         res.status(500).send("Internal Server Error");
     }
 });
+
+app.post("/api/problem/alter", (req, res, next) => {
+    try{
+        // extract the types and check them
+        let [id, author, title, statement, solution, problemTags, contestTags] = 
+        [req.body.id, req.body.author, req.body.title, req.body.statement, req.body.solution, req.body.problemTags, req.body.contestTags];
+        const paramTypes = [
+            [id, "problem id", "integer"], 
+            [author, "author id", "integer"],
+            [title, "problem title", "string"],
+            [statement, "problem statement", "string"],
+            [solution, "problem solution", "string"],
+            [problemTags, "problem tags", "array_int"],
+            [contestTags, "problem contest tags", "array_int"]
+        ];
+        let [typeSuccess, errorMessages] = validator.checkTypes(paramTypes)
+        if(!typeSuccess) {
+            res.status(400).send(errorMessages);
+            return;
+        }
+
+        if(tools.hasDuplicate(problemTags)){
+            res.status(400).send("problem tags has duplicates");
+            return;
+        }
+
+        if(tools.hasDuplicate(contestTags)){
+            res.status(400).send("contest tags has duplicates");
+            return;
+        }
+
+        // update the problem parameters
+        db.run("UPDATE Problems SET author=?, title=?, statement=?, solution=? WHERE id=?", [author, title, statement, solution, id], (err) => {
+            if(err) throw err;
+
+            // delete contest & problem tags (to later re-add them)
+            db.run("DELETE FROM Problem_to_ProblemTag WHERE problem_id=?", [id], (err) => {
+                if(err) throw err;
+                db.run("DELETE FROM Problem_to_ContestTag WHERE problem_id=?", [id], (err) => {
+                    if(err) throw err;
+
+                    // add problem & contest tags
+                    dbTools.addMultiple(db, "Problem_to_ProblemTag", ["problem_id", "tag_id"], problemTags.map((el) => [id, el])).then((err) => {
+                        if(err) throw err;
+
+                        dbTools.addMultiple(db, "Problem_to_ContestTag", ["problem_id", "tag_id"], problemTags.map((el) => [id, el])).then((err) => {
+                            if(err) throw err;
+                            // return a successful status
+                            res.status(200).end();
+                        }, (reason) => {throw new Error(reason);});
+
+                    }, (reason) => {throw new Error(reason);});
+                });
+            });
+        });
+    } catch(e) {
+        console.log("Alter Error!");
+        console.log(req.body);
+        console.log(e);
+        res.status(500).send("Internal Server Error");
+    }
+})
 
 app.listen(port, () => {
     console.log(`listening on port ${port}`);

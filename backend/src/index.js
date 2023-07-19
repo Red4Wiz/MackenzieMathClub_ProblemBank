@@ -1,5 +1,7 @@
-const sqlite3 = require("sqlite3")
-const express = require('express')
+const sqlite3 = require("sqlite3");
+const bodyParser = require("body-parser");
+const express = require('express');
+const validator = require('./validator');
 
 const db = new sqlite3.Database("data.db", sqlite3.OPEN_READWRITE, (err) => {
     if(err){
@@ -10,6 +12,8 @@ const db = new sqlite3.Database("data.db", sqlite3.OPEN_READWRITE, (err) => {
 
 const app = express()
 const port = 8080
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended:false}));
 
 app.get('/', (req, res) => {
     res.send("Hello World!");
@@ -67,7 +71,60 @@ app.get("/api/problem/get/:id", (req, res, next) => {
     }
 });
 
+app.post("/api/problem/create", (req, res, next) => {
+    try{
+        // extract the types and check them
+        let [author, title, statement, solution, problemTags, contestTags] = 
+                [req.body.author, req.body.title, req.body.statement, req.body.solution, req.body.problemTags, req.body.contestTags];
+        const paramTypes = [ 
+            [author, "author id", "integer"],
+            [title, "problem title", "string"],
+            [statement, "problem statement", "string"],
+            [solution, "problem solution", "string"],
+            [problemTags, "problem tags", "array_int"],
+            [contestTags, "problem contest tags", "array_int"]
+        ];
+        let [typeSuccess, errorMessages] = validator.checkTypes(paramTypes)
+        if(!typeSuccess) {
+            res.status(400).send(errorMessages);
+            return;
+        }
 
+        // insert problem into database
+        db.run("INSERT INTO Problems (author, title, statement, solution) VALUES (?, ?, ?, ?)", [author, title, statement, solution], function(err) {
+            if(err) throw err;
+
+            // insert all problem tag relationships into the database
+            let pId = this.lastID;
+            let sql = "INSERT INTO Problem_to_ProblemTag (problem_id, tag_id) VALUES " + Array(problemTags.length).fill("(?, ?)").join(", ");
+            let args = problemTags.reduce((acc, tagId) => {
+                acc.push(pId);
+                acc.push(tagId);
+                return acc;
+            }, [])
+
+            db.run(sql, args, (err) => {
+                // insert all contest tag relationships into the database
+                if(err) throw err;
+                let sql = "INSERT INTO Problem_to_ContestTag (problem_id, tag_id) VALUES " + Array(problemTags.length).fill("(?, ?)").join(", ");
+                let args = contestTags.reduce((acc, tagId) => {
+                    acc.push(pId);
+                    acc.push(tagId);
+                    return acc;
+                }, [])
+                db.run(sql, args, (err) => {
+                    if(err) throw err;
+                    res.status(201).json({'id': pId});
+                })
+            })
+        })
+    } catch (e) {
+        console.log("Creation Error!");
+        console.log(req.body);
+        console.log(e);
+        res.status(500).send("Internal Server Error");
+    }
+});
 
 app.listen(port, () => {
     console.log(`listening on port ${port}`);

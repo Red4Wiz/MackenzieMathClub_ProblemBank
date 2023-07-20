@@ -2,6 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import './App.css';
 import LoginPage from './LoginPage';
+import Hero from './Hero';
+import ProblemForm from './ProblemForm';
 
 const App = () => {
   return (
@@ -9,7 +11,9 @@ const App = () => {
       <div className="app">
         <header className="header">
           <div className="header-left">
-            <h1>Mackenzie Math Problem Bank</h1>
+            <Link to="/">
+              <h1>Mackenzie Math Problem Bank</h1>
+            </Link>
           </div>
           <div className="header-right">
             <Link to="/login">
@@ -17,9 +21,13 @@ const App = () => {
             </Link>
           </div>
         </header>
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
-        </Routes>
+        <div className="content">
+          <Routes>
+            <Route path="/" element={<Hero />} />
+            <Route path="/problem-form" element={<ProblemForm />} />
+            <Route path="/login" element={<LoginPage />} />
+          </Routes>
+        </div>
       </div>
     </Router>
   );

@@ -2,9 +2,6 @@ const sqlite3 = require("sqlite3");
 const bodyParser = require('body-parser');
 const express = require('express');
 const dbTools = require('./db_alter');
-const tools = require('./tools');
-const Ajv = require('ajv');
-const ajv = new Ajv();
 const schemas = require('./schemas');
 
 const db = new sqlite3.Database("data.db", sqlite3.OPEN_READWRITE, (err) => {

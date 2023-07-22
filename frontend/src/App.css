@@ -1,4 +1,3 @@
-/* App.css */
 .app {
   text-align: center;
 }
@@ -9,6 +8,13 @@
   align-items: center;
   background-color: lightgray;
   padding: 20px;
+}
+
+.header-left h1 {
+  margin: 0;
+  color: black;
+  text-decoration: underline; 
+  text-decoration-color: lightgray;
 }
 
 .header-left {
@@ -22,8 +28,10 @@
 .login-button {
   background-color: navy;
   color: white;
-  padding: 10px 20px;
+  padding: 15px 25px;
   border: none;
   cursor: pointer;
+  font-size: 17px ;
+  border-radius: 10px;
 }
   

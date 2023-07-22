@@ -73,6 +73,42 @@ app.get("/api/problem/get/:id", (req, res, next) => {
     }
 });
 
+app.get("/api/problemTags", (req, res, next) => {
+    try{
+        db.all("SELECT id, name FROM ProblemTags", (err, rows) => {
+            if(err) throw err;
+            res.json(rows.map((row) => {
+                return {
+                    id: row.id,
+                    name: row.name
+                }
+            }));
+        })
+    } catch(e) {
+        console.log("problem tag errored out");
+        console.log(e);
+        res.status(500).send("Internal Server Error");
+    }
+})
+
+app.get("/api/contestTags", (req, res, next) => {
+    try{
+        db.all("SELECT id, name FROM ContestTags", (err, rows) => {
+            if(err) throw err;
+            res.json(rows.map((row) => {
+                return {
+                    id: row.id,
+                    name: row.name
+                }
+            }));
+        })
+    } catch(e) {
+        console.log("contest tag errored out");
+        console.log(e);
+        res.status(500).send("Internal Server Error");
+    }
+})
+
 app.post("/api/problem/create", (req, res, next) => {
     try{
         // extract the types and check them
@@ -91,12 +127,10 @@ app.post("/api/problem/create", (req, res, next) => {
             res.status(400).send(errorMessages);
             return;
         }
-
         if(tools.hasDuplicate(problemTags)){
             res.status(400).send("problem tags has duplicates");
             return;
         }
-        
         if(tools.hasDuplicate(contestTags)){
             res.status(400).send("contest tags has duplicates");
             return;
@@ -105,26 +139,14 @@ app.post("/api/problem/create", (req, res, next) => {
         // insert problem into database
         db.run("INSERT INTO Problems (author, title, statement, solution) VALUES (?, ?, ?, ?)", [author, title, statement, solution], function(err) {
             if(err) throw err;
-
             // insert all problem tag relationships into the database
             let pId = this.lastID;
-            let sql = "INSERT INTO Problem_to_ProblemTag (problem_id, tag_id) VALUES " + Array(problemTags.length).fill("(?, ?)").join(", ");
-            let args = problemTags.reduce((acc, tagId) => {
-                acc.push(pId);
-                acc.push(tagId);
-                return acc;
-            }, [])
 
-            db.run(sql, args, (err) => {
+            dbTools.addMultiple(db, "Problem_to_ProblemTag", ["problem_id", "tag_id"], problemTags.map((el) => [pId, el])).then((err) => {
                 // insert all contest tag relationships into the database
                 if(err) throw err;
-                let sql = "INSERT INTO Problem_to_ContestTag (problem_id, tag_id) VALUES " + Array(problemTags.length).fill("(?, ?)").join(", ");
-                let args = contestTags.reduce((acc, tagId) => {
-                    acc.push(pId);
-                    acc.push(tagId);
-                    return acc;
-                }, [])
-                db.run(sql, args, (err) => {
+
+                dbTools.addMultiple(db, "Problem_to_ContestTag", ["problem_id", "tag_id"], problemTags.map((el) => [pId, el])).then((err) => {
                     if(err) throw err;
                     res.status(200).json({'id': pId});
                 })

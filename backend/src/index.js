@@ -1,9 +1,11 @@
 const sqlite3 = require("sqlite3");
 const bodyParser = require('body-parser');
 const express = require('express');
-const validator = require('./validator');
 const dbTools = require('./db_alter');
 const tools = require('./tools');
+const Ajv = require('ajv');
+const ajv = new Ajv();
+const schemas = require('./schemas');
 
 const db = new sqlite3.Database("data.db", sqlite3.OPEN_READWRITE, (err) => {
     if(err){
@@ -24,9 +26,9 @@ app.get('/', (req, res) => {
 app.get("/api/problem/get/:id", (req, res, next) => {
     try{
         // parse id
-        const id = parseInt(req.params.id);
-        if(isNaN(id)) {
-            res.status(400).send("id must be integral");
+        let id = req.params.id;
+        if(isNaN(id)){
+            res.status(400).send("id must be an integer");
             return;
         }
 
@@ -111,30 +113,16 @@ app.get("/api/contestTags", (req, res, next) => {
 
 app.post("/api/problem/create", (req, res, next) => {
     try{
+        // validate input
+        const valid = schemas.problemCreate(req.body);
+        if(!valid){
+            res.status(400).send(schemas.problemCreate.errors);
+            return;
+        }
+
         // extract the types and check them
         let [author, title, statement, solution, problemTags, contestTags] = 
                 [req.body.author, req.body.title, req.body.statement, req.body.solution, req.body.problemTags, req.body.contestTags];
-        const paramTypes = [ 
-            [author, "author id", "integer"],
-            [title, "problem title", "string"],
-            [statement, "problem statement", "string"],
-            [solution, "problem solution", "string"],
-            [problemTags, "problem tags", "array_int"],
-            [contestTags, "problem contest tags", "array_int"]
-        ];
-        let [typeSuccess, errorMessages] = validator.checkTypes(paramTypes)
-        if(!typeSuccess) {
-            res.status(400).send(errorMessages);
-            return;
-        }
-        if(tools.hasDuplicate(problemTags)){
-            res.status(400).send("problem tags has duplicates");
-            return;
-        }
-        if(tools.hasDuplicate(contestTags)){
-            res.status(400).send("contest tags has duplicates");
-            return;
-        }
 
         // insert problem into database
         db.run("INSERT INTO Problems (author, title, statement, solution) VALUES (?, ?, ?, ?)", [author, title, statement, solution], function(err) {
@@ -146,7 +134,7 @@ app.post("/api/problem/create", (req, res, next) => {
                 // insert all contest tag relationships into the database
                 if(err) throw err;
 
-                dbTools.addMultiple(db, "Problem_to_ContestTag", ["problem_id", "tag_id"], problemTags.map((el) => [pId, el])).then((err) => {
+                dbTools.addMultiple(db, "Problem_to_ContestTag", ["problem_id", "tag_id"], contestTags.map((el) => [pId, el])).then((err) => {
                     if(err) throw err;
                     res.status(200).json({'id': pId});
                 })
@@ -162,31 +150,10 @@ app.post("/api/problem/create", (req, res, next) => {
 
 app.post("/api/problem/alter", (req, res, next) => {
     try{
-        // extract the types and check them
-        let [id, author, title, statement, solution, problemTags, contestTags] = 
-        [req.body.id, req.body.author, req.body.title, req.body.statement, req.body.solution, req.body.problemTags, req.body.contestTags];
-        const paramTypes = [
-            [id, "problem id", "integer"], 
-            [author, "author id", "integer"],
-            [title, "problem title", "string"],
-            [statement, "problem statement", "string"],
-            [solution, "problem solution", "string"],
-            [problemTags, "problem tags", "array_int"],
-            [contestTags, "problem contest tags", "array_int"]
-        ];
-        let [typeSuccess, errorMessages] = validator.checkTypes(paramTypes)
-        if(!typeSuccess) {
-            res.status(400).send(errorMessages);
-            return;
-        }
-
-        if(tools.hasDuplicate(problemTags)){
-            res.status(400).send("problem tags has duplicates");
-            return;
-        }
-
-        if(tools.hasDuplicate(contestTags)){
-            res.status(400).send("contest tags has duplicates");
+        // validate input
+        const valid = schemas.problemAlter(req.body);
+        if(!valid){
+            res.status(400).send(schemas.problemCreate.errors);
             return;
         }
 
@@ -204,7 +171,7 @@ app.post("/api/problem/alter", (req, res, next) => {
                     dbTools.addMultiple(db, "Problem_to_ProblemTag", ["problem_id", "tag_id"], problemTags.map((el) => [id, el])).then((err) => {
                         if(err) throw err;
 
-                        dbTools.addMultiple(db, "Problem_to_ContestTag", ["problem_id", "tag_id"], problemTags.map((el) => [id, el])).then((err) => {
+                        dbTools.addMultiple(db, "Problem_to_ContestTag", ["problem_id", "tag_id"], contestTags.map((el) => [id, el])).then((err) => {
                             if(err) throw err;
                             // return a successful status
                             res.status(200).end();

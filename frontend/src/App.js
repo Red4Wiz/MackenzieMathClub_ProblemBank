@@ -4,6 +4,7 @@ import './App.css';
 import LoginPage from './LoginPage';
 import Hero from './Hero';
 import ProblemForm from './ProblemForm';
+import ProblemView from './ProblemView';
 
 const App = () => {
   return (
@@ -26,6 +27,7 @@ const App = () => {
             <Route path="/" element={<Hero />} />
             <Route path="/problem-form" element={<ProblemForm />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/problem-view/:id" element={<ProblemView />} />
           </Routes>
         </div>
       </div>

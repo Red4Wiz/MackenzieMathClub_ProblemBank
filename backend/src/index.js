@@ -303,6 +303,18 @@ app.get('/codes', (req, res) => {
     });
   });
 
+//problems
+app.get('/problems', (req, res) => {
+  db.all('SELECT id, title FROM Problems', (err, rows) => {
+    if (err) {
+      console.error('Error fetching problems:', err.message);
+      res.status(500).json({ error: 'Internal server error' });
+    } else {
+      res.json(rows);
+    }
+  });
+});
+
 app.listen(port, () => {
     console.log(`listening on port ${port}`);
 });

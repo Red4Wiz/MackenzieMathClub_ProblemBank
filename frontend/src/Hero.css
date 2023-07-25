@@ -1,21 +1,37 @@
 .hero-container {
-    display: flex;
-    justify-content: center;
-    padding-top: 20px;
-    height: 100vh;
+    text-align: center;
+    margin-top: 50px;
 }
-  
+
 .hero-button {
-    background-color: red;
+    background-color: navy;
     color: white;
-    font-size: 24px;
-    padding: 15px 30px;
+    padding: 15px 23px;
     border: none;
-    border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    font-size: 20px;
+    border-radius: 5px;
+}
+
+.problems-list {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.problem-item {
+    width: 80%;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.1);
+}
+
+.problem-item h3{
+    color: black;
+    text-decoration: underline; 
+    text-decoration-color: white;
+    font-size: 20px;
 }
   
-.hero-button:hover {
-    background-color: darkred;
-}

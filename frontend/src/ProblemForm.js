@@ -2,6 +2,8 @@ import React, {useState, useEffect} from 'react';
 import './ProblemForm.css';
 import {ROUTES} from './routes.js';
 import Select from 'react-select';
+import { useNavigate } from 'react-router-dom';
+
 
 const ProblemForm = () => {
   // a total list of tags
@@ -10,6 +12,9 @@ const ProblemForm = () => {
   // selected tags
   const [selectedPTags, setSelectedPTags] = useState([])
   const [selectedCTags, setSelectedCTags] = useState([])
+
+  const navigate = useNavigate();
+
 
   // get a list of possible tags
   useEffect(() => {
@@ -57,6 +62,7 @@ const ProblemForm = () => {
         res.json().then((value) => {
           console.log(value)
         })
+        navigate('/');
       } else {
         alert("Server Error!");
       }

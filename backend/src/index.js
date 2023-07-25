@@ -27,7 +27,29 @@ app.get('/', (req, res) => {
     res.send("Hello World!");
 });
 
-app.get("/api/problem/get/:id", (req, res, next) => {
+//JWT user auth
+
+const SECRET_KEY = 'your-secret-key';
+
+//  authenticate requests using JWT
+const authenticateJWT = (req, res, next) => {
+    const token = req.header('Authorization');
+  
+    if (!token) {
+      return res.sendStatus(401);
+    }
+  
+    jwt.verify(token, SECRET_KEY, (err, user) => {
+      if (err) {
+        return res.sendStatus(403);
+      }
+  
+      req.user = user;
+      next();
+    });
+};
+
+app.get("/api/problem/get/:id", authenticateJWT, (req, res, next) => {
     try{
         // parse id
         let id = req.params.id;
@@ -115,7 +137,7 @@ app.get("/api/contestTags", (req, res, next) => {
     }
 })
 
-app.post("/api/problem/create", (req, res, next) => {
+app.post("/api/problem/create", authenticateJWT, (req, res, next) => {
     try{
         // validate input
         const valid = schemas.problemCreate(req.body);
@@ -152,7 +174,7 @@ app.post("/api/problem/create", (req, res, next) => {
     }
 });
 
-app.post("/api/problem/alter", (req, res, next) => {
+app.post("/api/problem/alter", authenticateJWT, (req, res, next) => {
     try{
         // validate input
         const valid = schemas.problemAlter(req.body);
@@ -193,29 +215,6 @@ app.post("/api/problem/alter", (req, res, next) => {
     }
 })
 
-
-//JWT user auth
-
-const SECRET_KEY = 'your-secret-key';
-
-//  authenticate requests using JWT
-const authenticateJWT = (req, res, next) => {
-    const token = req.header('Authorization');
-  
-    if (!token) {
-      return res.sendStatus(401);
-    }
-  
-    jwt.verify(token, SECRET_KEY, (err, user) => {
-      if (err) {
-        return res.sendStatus(403);
-      }
-  
-      req.user = user;
-      next();
-    });
-  };
-
 // user login
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
@@ -251,9 +250,9 @@ app.get('/codes', (req, res) => {
         res.json(codes);
       }
     });
-  });
+});
 
-  app.get('/userlist', (req, res) => {
+app.get('/userlist', (req, res) => {
     db.all('SELECT * FROM Users', (err, rows) => {
       if (err) {
         console.error('Error fetching users: ', err.message);
@@ -262,10 +261,10 @@ app.get('/codes', (req, res) => {
         res.json(rows);
       }
     });
-  });
+});
   
   // Endpoint to handle user signup
-  app.post('/signup', (req, res) => {
+app.post('/signup', (req, res) => {
     const { firstName, lastName, username, password, oneTimeCode } = req.body;
   
     // Validate the oneTimeCode against the database
@@ -301,10 +300,10 @@ app.get('/codes', (req, res) => {
         );
       }
     });
-  });
+});
 
 //problems
-app.get('/problems', (req, res) => {
+app.get('/problems', authenticateJWT, (req, res) => {
   db.all('SELECT id, title FROM Problems', (err, rows) => {
     if (err) {
       console.error('Error fetching problems:', err.message);

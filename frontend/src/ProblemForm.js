@@ -46,7 +46,8 @@ const ProblemForm = () => {
     fetch(url, {
       method: "post",
       headers: {
-        "content-type": "application/json"
+        "content-type": "application/json",
+        "Authorization": localStorage.getItem('token')
       },
       body: JSON.stringify({
           'author': 1,

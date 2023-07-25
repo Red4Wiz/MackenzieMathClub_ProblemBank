@@ -52,7 +52,7 @@ const authenticateJWT = (req, res, next) => {
 app.get("/api/problem/get/:id", authenticateJWT, (req, res, next) => {
     try{
         // parse id
-        let id = req.params.id;
+        let id = parseInt(req.params.id);
         if(isNaN(id)){
             res.status(400).send("id must be an integer");
             return;
@@ -213,6 +213,31 @@ app.post("/api/problem/alter", authenticateJWT, (req, res, next) => {
         console.log(e);
         res.status(500).send("Internal Server Error");
     }
+})
+
+app.post('/api/problem/delete/:id', authenticateJWT, (req, res, next) => {
+  try {
+      let id = parseInt(req.params.id);
+      if(isNaN(id)){
+          res.status(400).send("id must be an integer");
+          return;
+      }
+
+      db.get("SELECT COUNT(id) AS cnt FROM Problems WHERE id=?", id, (err, row) => {
+        if(err) throw err;
+        if(row.cnt == 0) res.status(404).send(`Problem with id ${id} doesn't exist`);
+        else {
+          db.run("DELETE FROM Problems WHERE id=?", id, (err) => {
+            if(err) throw err;
+            res.send(`Deleted problem (id=${id})`);
+          })
+        }
+      })
+  } catch(e){
+    console.log(`Deletion error with id '${req.params.id}'`)
+    console.log(e);
+    req.status(500).send("Internal Server Error");
+  }
 })
 
 // user login

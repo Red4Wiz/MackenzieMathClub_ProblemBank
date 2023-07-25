@@ -10,7 +10,7 @@ const ProblemView = () => {
     const [solutionHidden, setSolutionHidden] = useState(true);
     console.log(`${ROUTES.api}/problem/get/${id}`)
     useEffect(() => {
-        fetch(`${ROUTES.api}/problem/get/${id}`).then((res) => {
+        fetch(`${ROUTES.api}/problem/get/${id}`, {'headers': {'Authorization': localStorage.getItem('token')}}).then((res) => {
             if(res.status === 200){
                 res.json().then((val) => {
                     setReady(true);

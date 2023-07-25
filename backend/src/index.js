@@ -5,6 +5,10 @@ const validator = require('./validator');
 const dbTools = require('./db_alter');
 const tools = require('./tools');
 
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const cors = require('cors');
+
 const db = new sqlite3.Database("data.db", sqlite3.OPEN_READWRITE, (err) => {
     if(err){
         console.log(err.message);
@@ -16,6 +20,9 @@ const app = express()
 const port = 8080
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:false}));
+
+app.use(express.json());
+app.use(cors());
 
 app.get('/', (req, res) => {
     res.send("Hello World!");
@@ -221,6 +228,116 @@ app.post("/api/problem/alter", (req, res, next) => {
         res.status(500).send("Internal Server Error");
     }
 })
+
+
+//JWT user auth
+
+const SECRET_KEY = 'your-secret-key';
+
+//  authenticate requests using JWT
+const authenticateJWT = (req, res, next) => {
+    const token = req.header('Authorization');
+  
+    if (!token) {
+      return res.sendStatus(401);
+    }
+  
+    jwt.verify(token, SECRET_KEY, (err, user) => {
+      if (err) {
+        return res.sendStatus(403);
+      }
+  
+      req.user = user;
+      next();
+    });
+  };
+
+// user login
+app.post('/login', (req, res) => {
+  const { username, password } = req.body;
+
+  db.get('SELECT * FROM Users WHERE username = ? AND password = ?', [username, password], (err, row) => {
+    if (err) {
+      console.error('Error fetching user: ', err.message);
+      res.status(500).json({ error: 'Internal server error' });
+    } else if (!row) {
+      res.status(401).json({ error: 'Invalid username or password' });
+    } else {
+      const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: '1h' });
+      res.json({ token });
+    }
+  });
+});
+
+// app.get('/protected', authenticateJWT, (req, res) => {
+//   res.json({ message: `Hello ${req.user.username}!` });
+// });
+
+
+//Signup
+
+// Endpoint to fetch the list of codes
+app.get('/codes', (req, res) => {
+    db.all('SELECT code FROM OneTimeCodes WHERE used = 0', (err, rows) => {
+      if (err) {
+        console.error('Error fetching codes: ', err.message);
+        res.status(500).json({ error: 'Internal server error' });
+      } else {
+        const codes = rows.map((row) => row.code);
+        res.json(codes);
+      }
+    });
+  });
+
+  app.get('/userlist', (req, res) => {
+    db.all('SELECT * FROM Users', (err, rows) => {
+      if (err) {
+        console.error('Error fetching users: ', err.message);
+        res.status(500).json({ error: 'Internal server error' });
+      } else {
+        res.json(rows);
+      }
+    });
+  });
+  
+  // Endpoint to handle user signup
+  app.post('/signup', (req, res) => {
+    const { firstName, lastName, username, password, oneTimeCode } = req.body;
+  
+    // Validate the oneTimeCode against the database
+    db.get('SELECT code, id FROM OneTimeCodes WHERE code = ? AND used = 0', [oneTimeCode], (err, row) => {
+      if (err) {
+        console.error('Error fetching code: ', err.message);
+        res.status(500).json({ error: 'Internal server error' });
+      } else if (!row) {
+        res.status(400).json({ error: 'Invalid one-time code' });
+      } else {
+        const { id } = row;
+        // Insert the user data into the database
+        db.run(
+          'INSERT INTO Users (username, firstname, lastname, password, permission) VALUES (?, ?, ?, ?, 1)',
+          [username, firstName, lastName, password],
+          function (err) {
+            if (err) {
+              console.error('Error inserting user data: ', err.message);
+              res.status(500).json({ error: 'Internal server error' });
+            } else {
+              const userId = this.lastID;
+              // Mark the one-time code as used and remove it from the table
+              db.run('DELETE FROM OneTimeCodes WHERE id = ?', [id], (err) => {
+                if (err) {
+                  console.error('Error removing one-time code: ', err.message);
+                  res.status(500).json({ error: 'Internal server error' });
+                } else {
+                  res.json({ message: 'User successfully signed up' });
+                }
+              });
+            }
+          }
+        );
+      }
+    });
+  });
 
 app.listen(port, () => {
     console.log(`listening on port ${port}`);

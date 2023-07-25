@@ -33,5 +33,21 @@
   cursor: pointer;
   font-size: 17px ;
   border-radius: 10px;
+  margin-right: 10px;
 }
-  
+
+.signup-button {
+  background-color: navy;
+  color: white;
+  padding: 15px 25px;
+  border: none;
+  cursor: pointer;
+  font-size: 17px ;
+  border-radius: 10px;
+}
+
+p {
+  font-size: 16px;
+  font-weight: bold;
+  margin-right: 30px; 
+}

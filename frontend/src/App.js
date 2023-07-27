@@ -7,6 +7,8 @@ import Hero from './Hero';
 import ProblemForm from './ProblemForm';
 import { useNavigate } from 'react-router-dom';
 import ProblemView from './ProblemView';
+import ProblemEdit from './ProblemEdit';
+
 
 const App = () => {
   const [loggedIn, setLoggedIn] = useState(localStorage.getItem('token') ? true : false);
@@ -48,6 +50,7 @@ const App = () => {
             <Route path="/" element={loggedIn ? <Hero /> : <Navigate to="/login" />} />
             <Route path="/problem-form" element={loggedIn ? <ProblemForm /> : <Navigate to="/login" />} />
             <Route path="/problem-view/:id" element={loggedIn ? <ProblemView /> : <Navigate to="/login" />} />
+            <Route path="/problem-edit/:id" element={loggedIn ? <ProblemEdit /> : <Navigate to="/login" />} />
             {!loggedIn ? (
               <>
                 <Route path="/login" element={<LoginPage setLoggedIn={setLoggedIn} />} />

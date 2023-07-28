@@ -8,7 +8,7 @@ const ProblemView = () => {
     const [error, setError] = useState(undefined);
     const [problem, setProblem] = useState({});
     const [solutionHidden, setSolutionHidden] = useState(true);
-    console.log(`${ROUTES.api}/problem/get/${id}`)
+    
     useEffect(() => {
         fetch(`${ROUTES.api}/problem/get/${id}`, {'headers': {'Authorization': localStorage.getItem('token')}}).then((res) => {
             if(res.status === 200){
@@ -40,11 +40,11 @@ const ProblemView = () => {
             </div>
             <p>
                 <b>Problem Types: </b>
-                {problem.problem_tags.map((tagName) => <span key={`problem-tag:${tagName}`}>{tagName}</span>)}
+                {problem.problem_tags.map((tagName) => <span key={`problem-tag:${tagName.name}`}>{tagName.name}</span>)}
             </p>
             <p>
                 <b>Contest Types: </b>
-                {problem.contest_tags.map((tagName) => <span key={`contest-tag:${tagName}`}>{tagName}</span>)}
+                {problem.contest_tags.map((tagName) => <span key={`contest-tag:${tagName.name}`}>{tagName.name}</span>)}
             </p>
             <button onClick={() => setSolutionHidden(!solutionHidden)}>Toggle Solution</button>
             <div>

@@ -73,11 +73,11 @@ app.get("/api/problem/get/:id", authenticateJWT, (req, res, next) => {
             info.contest_tags = [];
 
             // select all tags corresponding to current problem
-            const problem_tag_sql = `SELECT tags.name FROM
+            const problem_tag_sql = `SELECT tags.id AS id, tags.name AS name FROM
                                     Problem_to_ProblemTag as pt INNER JOIN ProblemTags as tags
                                     ON tags.id = pt.tag_id
                                     WHERE pt.problem_id = ?`
-            const contest_tag_sql = `SELECT tags.name FROM
+            const contest_tag_sql = `SELECT tags.id AS id, tags.name AS name FROM
                                     Problem_to_ContestTag as pt INNER JOIN ContestTags as tags
                                     ON tags.id = pt.tag_id
                                     WHERE pt.problem_id = ?`
@@ -85,11 +85,11 @@ app.get("/api/problem/get/:id", authenticateJWT, (req, res, next) => {
             // find names of problem tags
             db.all(problem_tag_sql, [id], (err, rows) => {
                 if(err) throw err;
-                info.problem_tags = rows.map((row) => row.name);
+                info.problem_tags = rows.map((row) => {return {id: row.id, name: row.name}});
                 // find names of contest tags
                 db.all(contest_tag_sql, [id], (err, rows) => {
                     if(err) throw err;
-                    info.contest_tags = rows.map((row) => row.name);
+                    info.contest_tags = rows.map((row) => {return {id: row.id, name: row.name}});
                     res.json(info);
                 })
             })
@@ -179,9 +179,13 @@ app.post("/api/problem/alter", authenticateJWT, (req, res, next) => {
         // validate input
         const valid = schemas.problemAlter(req.body);
         if(!valid){
-            res.status(400).send(schemas.problemCreate.errors);
-            return;
+          res.status(400).json(schemas.problemAlter.errors);
+          return;
         }
+        
+        // extract the types and check them
+        let [id, author, title, statement, solution, problemTags, contestTags] = 
+        [req.body.id, req.body.author, req.body.title, req.body.statement, req.body.solution, req.body.problemTags, req.body.contestTags];
 
         // update the problem parameters
         db.run("UPDATE Problems SET author=?, title=?, statement=?, solution=? WHERE id=?", [author, title, statement, solution, id], (err) => {

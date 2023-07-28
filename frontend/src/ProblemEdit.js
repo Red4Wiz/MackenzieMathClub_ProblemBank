@@ -59,6 +59,25 @@ const ProblemEdit = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    fetch(`${ROUTES.api}/problem/alter`, {
+      method: 'post',
+      headers: {
+        Authorization: localStorage.getItem('token'),
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        'id': problem.id,
+        'author': problem.author,
+        'title': problem.title,
+        'statement': problem.statement,
+        'solution': problem.solution,
+        'problemTags': selectedPTags.map((el) => el.value),
+        'contestTags': selectedCTags.map((el) => el.value)
+      })
+    }).then((res) => {
+      if(res.status === 200) alert('Problem Altered');
+      else alert('Error');
+    })
   };  
 
   return (

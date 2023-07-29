@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {useParams} from 'react-router-dom';
 import {ROUTES} from './routes';
+import Markdown from './markdown';
 
 const ProblemView = () => {
     const { id } = useParams();
@@ -55,6 +56,8 @@ const ProblemView = () => {
                     </div>
                 }
             </div>
+            
+            <Markdown>Be *bold*, $maff$</Markdown>
         </div>
         );
     }

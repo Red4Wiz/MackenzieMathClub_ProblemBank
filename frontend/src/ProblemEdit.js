@@ -78,7 +78,7 @@ const ProblemEdit = () => {
     }).then((res) => {
       if(res.status === 200) {
         alert('Problem Altered');
-        window.location.replace('/');
+        navigate('/');
       } else alert('Error');
     })
   };  

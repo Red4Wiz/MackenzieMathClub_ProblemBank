@@ -76,8 +76,10 @@ const ProblemEdit = () => {
         'contestTags': selectedCTags.map((el) => el.value)
       })
     }).then((res) => {
-      if(res.status === 200) alert('Problem Altered');
-      else alert('Error');
+      if(res.status === 200) {
+        alert('Problem Altered');
+        window.location.replace('/');
+      } else alert('Error');
     })
   };  
 

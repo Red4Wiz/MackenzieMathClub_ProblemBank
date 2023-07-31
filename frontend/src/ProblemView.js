@@ -37,7 +37,7 @@ const ProblemView = () => {
             <hr />
             <div>
                 <h4>Problem Statement</h4>
-                <p>{problem.statement}</p>
+                <Markdown>{problem.statement}</Markdown>
             </div>
             <p>
                 <b>Problem Types: </b>
@@ -56,8 +56,6 @@ const ProblemView = () => {
                     </div>
                 }
             </div>
-            
-            <Markdown>Be *bold*, $maff$</Markdown>
         </div>
         );
     }

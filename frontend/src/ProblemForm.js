@@ -3,6 +3,7 @@ import './ProblemForm.css';
 import {ROUTES} from './routes.js';
 import Select from 'react-select';
 import { useNavigate } from 'react-router-dom';
+import { MarkdownEditor } from './markdown';
 
 
 const ProblemForm = () => {
@@ -12,6 +13,9 @@ const ProblemForm = () => {
   // selected tags
   const [selectedPTags, setSelectedPTags] = useState([])
   const [selectedCTags, setSelectedCTags] = useState([])
+  // statement & solution
+  const [statement, setStatement] = useState('')
+  const [solution, setSolution] = useState('')
 
   const navigate = useNavigate();
 
@@ -52,8 +56,8 @@ const ProblemForm = () => {
       body: JSON.stringify({
           'author': 1,
           'title': data.get('title'),
-          'statement': data.get('statement'),
-          'solution': data.get('solution'),
+          'statement': statement,
+          'solution': solution,
           'problemTags': selectedPTags.map((e) => e.value),
           'contestTags': selectedCTags.map((e) => e.value)
         })
@@ -80,11 +84,11 @@ const ProblemForm = () => {
         </label>
         <label>
           Statement:
-          <textarea name="statement" />
+          <MarkdownEditor value={statement} onChange={setStatement} markdownHeading={<h3>Preview</h3>} />
         </label>
         <label>
           Solution:
-          <textarea name="solution" />
+          <MarkdownEditor value={solution} onChange={setSolution} markdownHeading={<h3>Preview</h3>} />
         </label>
         <label>
           Problem Tags:

@@ -3,6 +3,7 @@ import './ProblemForm.css';
 import { ROUTES } from './routes.js';
 import Select from 'react-select';
 import { useNavigate, useParams } from 'react-router-dom';
+import { MarkdownEditor } from './markdown';
 
 const ProblemEdit = () => {
   const { id } = useParams();
@@ -90,11 +91,12 @@ const ProblemEdit = () => {
         </label>
         <label>
           Statement:
-          <textarea name="statement" value={problem.statement || ''} onChange={(e) => setProblem({ ...problem, statement: e.target.value })} />
+          <MarkdownEditor value={problem.statement || ''} onChange={(val) => setProblem({ ...problem, statement: val })} markdownHeading={<h3>Preview</h3>} />
         </label>
         <label>
           Solution:
-          <textarea name="solution" value={problem.solution || ''} onChange={(e) => setProblem({ ...problem, solution: e.target.value })} />
+          <MarkdownEditor value={problem.solution || ''} onChange={(val) => setProblem({ ...problem, solution: val })} 
+            markdownHeading={<h3>Preview</h3>}/>
         </label>
         <label>
           Problem Tags:

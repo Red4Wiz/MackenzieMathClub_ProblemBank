@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {useParams} from 'react-router-dom';
 import {ROUTES} from './routes';
+import Markdown from './markdown';
 
 const ProblemView = () => {
     const { id } = useParams();
@@ -36,7 +37,7 @@ const ProblemView = () => {
             <hr />
             <div>
                 <h4>Problem Statement</h4>
-                <p>{problem.statement}</p>
+                <Markdown>{problem.statement}</Markdown>
             </div>
             <p>
                 <b>Problem Types: </b>

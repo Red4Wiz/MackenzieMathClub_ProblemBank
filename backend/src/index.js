@@ -244,27 +244,36 @@ app.post('/api/problem/delete/:id', authenticateJWT, (req, res, next) => {
   }
 })
 
+// app.get('/protected', authenticateJWT, (req, res) => {
+//   res.json({ message: `Hello ${req.user.username}!` });
+// });
+
 // user login
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
 
-  db.get('SELECT * FROM Users WHERE username = ? AND password = ?', [username, password], (err, row) => {
+  db.get('SELECT * FROM Users WHERE username = ?', [username], (err, row) => {
     if (err) {
       console.error('Error fetching user: ', err.message);
       res.status(500).json({ error: 'Internal server error' });
     } else if (!row) {
       res.status(401).json({ error: 'Invalid username or password' });
     } else {
-      const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: '1h' });
-      res.json({ token });
+      // Compare the password with the stored hashed password
+      bcrypt.compare(password, row.password, (err, result) => {
+        if (err) {
+          console.error('Error comparing passwords: ', err.message);
+          res.status(500).json({ error: 'Internal server error' });
+        } else if (result === false) {
+          res.status(401).json({ error: 'Invalid username or password' });
+        } else {
+          const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: '1h' });
+          res.json({ token });
+        }
+      });
     }
   });
 });
-
-// app.get('/protected', authenticateJWT, (req, res) => {
-//   res.json({ message: `Hello ${req.user.username}!` });
-// });
-
 
 //Signup
 
@@ -292,44 +301,61 @@ app.get('/userlist', (req, res) => {
     });
 });
   
-  // Endpoint to handle user signup
+// Endpoint to handle user signup
 app.post('/signup', (req, res) => {
-    const { firstName, lastName, username, password, oneTimeCode } = req.body;
-  
-    // Validate the oneTimeCode against the database
-    db.get('SELECT code, id FROM OneTimeCodes WHERE code = ? AND used = 0', [oneTimeCode], (err, row) => {
-      if (err) {
-        console.error('Error fetching code: ', err.message);
-        res.status(500).json({ error: 'Internal server error' });
-      } else if (!row) {
-        res.status(400).json({ error: 'Invalid one-time code' });
-      } else {
-        const { id } = row;
-        // Insert the user data into the database
-        db.run(
-          'INSERT INTO Users (username, firstname, lastname, password, permission) VALUES (?, ?, ?, ?, 1)',
-          [username, firstName, lastName, password],
-          function (err) {
+  const { firstName, lastName, username, password, oneTimeCode } = req.body;
+
+  // Validate the oneTimeCode against the database
+  db.get('SELECT code, id FROM OneTimeCodes WHERE code = ? AND used = 0', [oneTimeCode], (err, row) => {
+    if (err) {
+      console.error('Error fetching code: ', err.message);
+      res.status(500).json({ error: 'Internal server error' });
+    } else if (!row) {
+      res.status(400).json({ error: 'Invalid one-time code' });
+    } else {
+      const { id } = row;
+
+      // Generate a salt for password hashing
+      bcrypt.genSalt(10, (err, salt) => {
+        if (err) {
+          console.error('Error generating salt: ', err.message);
+          res.status(500).json({ error: 'Internal server error' });
+        } else {
+          // Hash the password with the generated salt
+          bcrypt.hash(password, salt, (err, hashedPassword) => {
             if (err) {
-              console.error('Error inserting user data: ', err.message);
+              console.error('Error hashing password: ', err.message);
               res.status(500).json({ error: 'Internal server error' });
             } else {
-              const userId = this.lastID;
-              // Mark the one-time code as used and remove it from the table
-              db.run('DELETE FROM OneTimeCodes WHERE id = ?', [id], (err) => {
-                if (err) {
-                  console.error('Error removing one-time code: ', err.message);
-                  res.status(500).json({ error: 'Internal server error' });
-                } else {
-                  res.json({ message: 'User successfully signed up' });
+              // Insert the user data into the database
+              db.run(
+                'INSERT INTO Users (username, firstname, lastname, password, salt, permission) VALUES (?, ?, ?, ?, ?, 1)',
+                [username, firstName, lastName, hashedPassword, salt],
+                function (err) {
+                  if (err) {
+                    console.error('Error inserting user data: ', err.message);
+                    res.status(500).json({ error: 'Internal server error' });
+                  } else {
+                    // Mark the one-time code as used and remove it from the table
+                    db.run('DELETE FROM OneTimeCodes WHERE id = ?', [id], (err) => {
+                      if (err) {
+                        console.error('Error removing one-time code: ', err.message);
+                        res.status(500).json({ error: 'Internal server error' });
+                      } else {
+                        res.json({ message: 'User successfully signed up' });
+                      }
+                    });
+                  }
                 }
-              });
+              );
             }
-          }
-        );
-      }
-    });
+          });
+        }
+      });
+    }
+  });
 });
+  
 
 //problems
 app.get('/problems', authenticateJWT, (req, res) => {

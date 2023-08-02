@@ -7,6 +7,7 @@ const schemas = require('./schemas');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
+const crypto = require('crypto');
 
 const db = new sqlite3.Database("data.db", sqlite3.OPEN_READWRITE, (err) => {
     if(err){
@@ -29,7 +30,12 @@ app.get('/', (req, res) => {
 
 //JWT user auth
 
-const SECRET_KEY = 'your-secret-key';
+// generate random secure key
+const generateJWTSecretKey = () => {
+  return crypto.randomBytes(64).toString('hex');
+};
+
+const SECRET_KEY = generateJWTSecretKey();  
 
 //  authenticate requests using JWT
 const authenticateJWT = (req, res, next) => {

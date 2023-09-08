@@ -22,22 +22,25 @@ const LoginPage = ({ setLoggedIn }) => {
 
   return (
     <div className="login-page">
-      <h2>Login</h2>
       {error && <p className="error-message">{error}</p>}
       <form className="login-form" onSubmit={handleSubmit}>
+        <label htmlFor="username" className='input-text'>Username</label>
         <input
           type="text"
-          placeholder="Username"
+          id="username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
+
+        <label htmlFor="password" className='input-text'>Password</label>
         <input
           type="password"
-          placeholder="Password"
+          id="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <button type="submit">Login</button>
+
+        <button type="submit">Login!</button>
       </form>
     </div>
   );

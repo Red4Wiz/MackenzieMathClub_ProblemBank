@@ -25,10 +25,21 @@ const App = () => {
         <header className="header">
           <div className="header-left">
             <Link to="/">
-              <h1>Mackenzie Math Problem Bank</h1>
+              {/* <img src="logo.png" alt="Logo" /> */}
+              <h1>Mackenzie Math Club</h1>
             </Link>
           </div>
-          <div className="header-right">
+          
+        </header>
+        <div className="content">
+
+          <div className="header-text">
+            <div className="header-text-line1">WHERE ALL YOUR PROBLEMS CAN BE FOUND</div>
+            <div className="header-text-line2">Mackenzie Math Problem Bank</div>
+          </div>
+
+          <div div className="line1"></div>
+          <div className="logging">
             {loggedIn ? (
               <>
                 <button className="login-button" onClick={handleLogout}>Logout</button>
@@ -44,8 +55,8 @@ const App = () => {
               </>
             )}
           </div>
-        </header>
-        <div className="content">
+          <div div className="line2"></div>
+
           <Routes>
             <Route path="/" element={loggedIn ? <Hero /> : <Navigate to="/login" />} />
             <Route path="/problem-form" element={loggedIn ? <ProblemForm /> : <Navigate to="/login" />} />

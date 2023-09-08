@@ -52,40 +52,39 @@ const SignupPage = () => {
 
   return (
     <div className="signup-page">
-      <h2>Sign Up</h2>
       {error && <p className="error-message">{error}</p>}
       <form className="signup-form" onSubmit={handleSubmit}>
+        <label htmlFor="username" className='input-text'>First Name</label>
         <input
           type="text"
-          placeholder="First Name"
           value={firstName}
           onChange={(e) => setFirstName(e.target.value)}
         />
+        <label htmlFor="username" className='input-text'>Last Name</label>
         <input
           type="text"
-          placeholder="Last Name"
           value={lastName}
           onChange={(e) => setLastName(e.target.value)}
         />
+        <label htmlFor="username" className='input-text'>Username</label>
         <input
           type="text"
-          placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
+        <label htmlFor="username" className='input-text'>Password</label>
         <input
           type="password"
-          placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
+        <label htmlFor="username" className='input-text'>One Time Code</label>
         <input
           type="text"
-          placeholder="One Time Code"
           value={oneTimeCode}
           onChange={(e) => setOneTimeCode(e.target.value)}
         />
-        <button type="submit">Sign Up</button>
+        <button type="submit">Sign Up!</button>
       </form>
     </div>
   );

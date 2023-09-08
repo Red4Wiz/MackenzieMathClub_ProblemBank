@@ -6,48 +6,75 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: lightgray;
+  background-color: white;
   padding: 20px;
+  box-shadow: 0px 5px 5px rgba(128, 128, 128, 0.5);
 }
 
 .header-left h1 {
+  font-family: 'asap', sans-serif;
   margin: 0;
-  color: black;
+  color: #234C9E;
   text-decoration: underline; 
-  text-decoration-color: lightgray;
+  font-weight: lighter;
+  font-size: 20px;
+  text-decoration-color: white;
 }
 
 .header-left {
   text-align: left;
 }
 
-.header-right {
-  text-align: right;
+.loggingright {
+  text-align: center;
 }
 
 .login-button {
-  background-color: navy;
-  color: white;
-  padding: 15px 25px;
-  border: none;
+  background-color: white;
+  color: black;
+  border: 3px solid black;
+  border-color: black;
   cursor: pointer;
   font-size: 17px ;
-  border-radius: 10px;
-  margin-right: 10px;
+  padding: 10px 20px;
+  font-weight: bold;
 }
 
 .signup-button {
-  background-color: navy;
-  color: white;
-  padding: 15px 25px;
-  border: none;
+  background-color: white;
+  color: black;
+  border: 3px solid black;
+  border-color: black;
   cursor: pointer;
   font-size: 17px ;
-  border-radius: 10px;
+  padding: 10px 20px;
+  font-weight: bold;
+  margin-left: -5px;
+}
+
+.line1 {
+  border-top: 3px solid black;
+  margin-bottom: -3px;
+}
+.line2 {
+  border-top: 3px solid black;
+  margin-top: -3px;
 }
 
 p {
   font-size: 16px;
   font-weight: bold;
   margin-right: 30px; 
+}
+
+.header-text-line1 {
+  font-size: 20px;
+  margin: 30px;
+  font-family: 'asap', sans-serif;
+}
+
+.header-text-line2 {
+  font-size: 60px;
+  margin-bottom: 40px;
+  font-family: 'inria-serif', serif;
 }

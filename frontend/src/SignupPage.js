@@ -54,33 +54,38 @@ const SignupPage = () => {
     <div className="signup-page">
       {error && <p className="error-message">{error}</p>}
       <form className="signup-form" onSubmit={handleSubmit}>
-        <label htmlFor="username" className='input-text'>First Name</label>
+        <label htmlFor="firstname" className='input-text'>First Name</label>
         <input
           type="text"
+          id="firstname"
           value={firstName}
           onChange={(e) => setFirstName(e.target.value)}
         />
-        <label htmlFor="username" className='input-text'>Last Name</label>
+        <label htmlFor="lastname" className='input-text'>Last Name</label>
         <input
           type="text"
+          id="lastname"
           value={lastName}
           onChange={(e) => setLastName(e.target.value)}
         />
         <label htmlFor="username" className='input-text'>Username</label>
         <input
           type="text"
+          id="username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
-        <label htmlFor="username" className='input-text'>Password</label>
+        <label htmlFor="password" className='input-text'>Password</label>
         <input
           type="password"
+          id="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <label htmlFor="username" className='input-text'>One Time Code</label>
+        <label htmlFor="otc" className='input-text'>One Time Code</label>
         <input
           type="text"
+          id="otc"
           value={oneTimeCode}
           onChange={(e) => setOneTimeCode(e.target.value)}
         />

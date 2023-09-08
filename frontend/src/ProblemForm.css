@@ -1,57 +1,62 @@
 .problem-form-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    padding-top: 50px;
-  }
-  
-  .problem-form {
-    background-color: #f2f2f2;
-    width: 70%;
-    max-width: 600px;
-    padding: 30px;
-    border-radius: 5px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-  }
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  padding-top: 50px;
+  margin-bottom: 40px;
+}
 
-  .problem-form h2 {
-    margin-bottom: 20px;
-    text-align: center;
-  }
-  
-  .problem-form label {
-    display: block;
-    margin-bottom: 10px;
-    font-weight: bold;
-  }
-  
-  .problem-form input,
-  .problem-form textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    margin-bottom: 20px;
-  }
-  
-  .problem-form textarea {
-    height: 150px;
-  }
-  
-  .problem-form button {
-    background-color: red;
-    color: white;
-    font-size: 18px;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    width: 100%;
-    transition: background-color 0.3s ease;
-  }
-  
-  .problem-form button:hover {
-    background-color: darkred;
-  }
-  
+.problem-form {
+  background-color: white;
+  width: 50%;
+  padding: 30px;
+  border: 2px solid black;
+  border-radius: 0;
+  box-shadow: none;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.problem-form label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: bold;
+  text-align: left;
+}
+
+.label h3{
+  font-weight: 100;
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.problem-form input,
+.problem-form textarea {
+  width: 95%;
+  padding: 10px;
+  border: 2px solid black;
+  border-radius: 0;
+  margin: 0 auto;
+}
+
+.problem-form textarea {
+  height: 150px;
+}
+
+.problem-form button {
+  background-color: black;
+  color: white;
+  font-weight: bold;
+  font-family: 'asap', sans-serif;
+  width: 100px;
+  margin-top: 20px;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.line {
+  width: 100%;
+  border-top: 1px solid #000;
+  margin: 10px auto; 
+}

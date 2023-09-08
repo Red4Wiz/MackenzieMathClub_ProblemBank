@@ -42,7 +42,14 @@ const App = () => {
           <div className="logging">
             {loggedIn ? (
               <>
-                <button className="login-button" onClick={handleLogout}>Logout</button>
+                <Link to="/problem-form">
+                  <button className="login-button">Create Problem</button>
+                </Link>
+                <Link to="/">
+                  <button className="signup-button">View Problems</button>
+                </Link>
+                <button className="signup-button" onClick={handleLogout}>Logout</button>
+                
               </>
             ) : (
               <>

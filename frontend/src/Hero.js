@@ -32,9 +32,7 @@ const Hero = () => {
 
   return (
     <div className="hero-container">
-      <Link to="/problem-form">
-        <button className="hero-button">Create a Problem</button>
-      </Link>
+      
       <div className="problems-list">
         {problems.map((problem) => (
           //links to the problem

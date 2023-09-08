@@ -40,6 +40,21 @@
   font-weight: bold;
 }
 
+.loggedin-button{
+  background-color: white;
+  color: black;
+  border: 3px solid black;
+  border-color: black;
+  cursor: pointer;
+  font-size: 17px ;
+  padding: 10px 20px;
+  font-weight: bold;
+}
+
+.loggedin-button:last-child{
+  margin: -3px;
+}
+
 .signup-button {
   background-color: white;
   color: black;

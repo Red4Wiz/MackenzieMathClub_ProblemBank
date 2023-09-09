@@ -93,3 +93,8 @@ p {
   margin-bottom: 40px;
   font-family: 'inria-serif', serif;
 }
+
+.h-flex {
+  display: flex;
+  flex-direction: row;
+}

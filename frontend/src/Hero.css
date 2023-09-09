@@ -30,7 +30,7 @@
     transition-duration: 0.5s;
 }
 
-.problem-item:hover {
+.problem-selectable:hover {
     box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.2);
 }
 
@@ -64,6 +64,10 @@
     color: gray;
 }
 
+.statement-desc p {
+    font-size: 15px;
+}
+
 .topic-tag, .contest-tag{
     padding: 1px 10px;
     border-radius: 20px;
@@ -79,4 +83,19 @@
 .contest-tag {
     background-color: black;
     color: white;
+}
+
+.solid-rect {
+    border-radius: 0;
+    padding: 5px 15px;
+}
+
+.black-bg {
+    background-color: black;
+    color: white;
+    border: none;
+}
+
+.clickable {
+    cursor: pointer;
 }

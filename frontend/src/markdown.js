@@ -25,7 +25,7 @@ export const MarkdownEditor = (props) => {
   return (<div>
     <textarea name="statement" value={value || ''} onChange={(e) => onChange(e.target.value)} />
     {markdownHeading}
-    <Markdown>{value}</Markdown>
+    <Markdown className='statement-desc'>{value}</Markdown>
   </div>);
 }
 

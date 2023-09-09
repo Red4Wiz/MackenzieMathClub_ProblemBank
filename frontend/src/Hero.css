@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Asap&display=swap');
+
 .hero-container {
     text-align: center;
     margin-top: 50px;
@@ -22,10 +24,14 @@
 
 .problem-item {
     width: 80%;
-    border: 1px solid #ccc;
-    border-radius: 10px;
     margin-bottom: 15px;
     box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.1);
+    border: 3px solid black;
+    transition-duration: 0.5s;
+}
+
+.problem-item:hover {
+    box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.2);
 }
 
 .problem-item h3{
@@ -34,4 +40,43 @@
     text-decoration-color: white;
     font-size: 20px;
 }
-  
+
+.problem-item p {
+    font-weight: bolder;
+}
+
+.problem-top p{
+    font-family: 'Asap', sans-serif;
+}
+
+.header-link {
+    color: black;
+    text-decoration: none;
+}
+
+.header-link:hover {
+    text-decoration: underline;
+}
+
+.statement-desc {
+    font-family: 'Asap', sans-serif;
+    font-weight: lighter;
+    color: gray;
+}
+
+.topic-tag, .contest-tag{
+    padding: 1px 10px;
+    border-radius: 20px;
+    font-family: 'Asap', sans-serif;
+    font-weight: 200;
+}
+
+.topic-tag {
+    color: black;
+    border: solid 2px black;
+}
+
+.contest-tag {
+    background-color: black;
+    color: white;
+}

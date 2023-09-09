@@ -19,3 +19,13 @@ exports.addMultiple = (db, tableName, columns, values) => {
         db.run(`INSERT INTO ${tableName} (${columns.join(",")}) VALUES ${cols}`, values.flat(), resolve);
     })
 }
+
+exports.get = (db, query, fill, needExist=false) => {
+    return new Promise((resolve, reject) => {
+        db.get(query, fill, (err, row) => {
+            if(err) reject(err);
+            if(needExist && !row) reject(new Error(`DB query ${query} with parameters ${fill} doesn't yield a row`))
+            else resolve(row);
+        })
+    })
+}

@@ -55,7 +55,7 @@ const authenticateJWT = (req, res, next) => {
     });
 };
 
-app.get("/api/problem/get/:id", authenticateJWT, (req, res, next) => {
+app.get("/api/problem/get/:id", authenticateJWT, async (req, res, next) => {
     try{
         // parse id
         let id = parseInt(req.params.id);
@@ -63,41 +63,42 @@ app.get("/api/problem/get/:id", authenticateJWT, (req, res, next) => {
             res.status(400).send("id must be an integer");
             return;
         }
-
         // find the intended problem (if it doesn't exist, then this won't run)
-        db.get("SELECT * FROM Problems WHERE id=?", id, (err, row) => {
+        const row = await dbTools.get(db, "SELECT * FROM Problems WHERE id=?", [id])
+
+        if(!row) {
+            res.status(404).send("couldn't find the problem");
+            return;
+        }
+
+        const allowed_headings = ["id", "title", "statement", "solution"];
+
+        // info tags
+        let info = Object.fromEntries(allowed_headings.map((val) => [val, row[val]]));
+        
+        // author
+        const author = await dbTools.get(db, 'SELECT username, firstname, lastname FROM Users WHERE id=?', [row.author])
+        info.author = {id: row.author, firstname: author.firstname, lastname: author.lastname, username: author.username}
+
+        // select all tags corresponding to current problem
+        const problem_tag_sql = `SELECT tags.id AS id, tags.name AS name FROM
+                                Problem_to_ProblemTag as pt INNER JOIN ProblemTags as tags
+                                ON tags.id = pt.tag_id
+                                WHERE pt.problem_id = ?`
+        const contest_tag_sql = `SELECT tags.id AS id, tags.name AS name FROM
+                                Problem_to_ContestTag as pt INNER JOIN ContestTags as tags
+                                ON tags.id = pt.tag_id
+                                WHERE pt.problem_id = ?`
+
+        // find names of problem tags
+        db.all(problem_tag_sql, [id], (err, rows) => {
             if(err) throw err;
-            if(!row) {
-                res.status(404).send("couldn't find the problem");
-                return;
-            }
-
-            const allowed_headings = ["id", "author", "title", "statement", "solution"];
-
-            // info tags
-            let info = Object.fromEntries(allowed_headings.map((val) => [val, row[val]]));
-            info.contest_tags = [];
-
-            // select all tags corresponding to current problem
-            const problem_tag_sql = `SELECT tags.id AS id, tags.name AS name FROM
-                                    Problem_to_ProblemTag as pt INNER JOIN ProblemTags as tags
-                                    ON tags.id = pt.tag_id
-                                    WHERE pt.problem_id = ?`
-            const contest_tag_sql = `SELECT tags.id AS id, tags.name AS name FROM
-                                    Problem_to_ContestTag as pt INNER JOIN ContestTags as tags
-                                    ON tags.id = pt.tag_id
-                                    WHERE pt.problem_id = ?`
-
-            // find names of problem tags
-            db.all(problem_tag_sql, [id], (err, rows) => {
+            info.problem_tags = rows.map((row) => {return {id: row.id, name: row.name}});
+            // find names of contest tags
+            db.all(contest_tag_sql, [id], (err, rows) => {
                 if(err) throw err;
-                info.problem_tags = rows.map((row) => {return {id: row.id, name: row.name}});
-                // find names of contest tags
-                db.all(contest_tag_sql, [id], (err, rows) => {
-                    if(err) throw err;
-                    info.contest_tags = rows.map((row) => {return {id: row.id, name: row.name}});
-                    res.json(info);
-                })
+                info.contest_tags = rows.map((row) => {return {id: row.id, name: row.name}});
+                res.json(info);
             })
         })
     } catch(e) {

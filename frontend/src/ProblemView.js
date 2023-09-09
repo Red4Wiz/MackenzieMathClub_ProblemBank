@@ -33,7 +33,7 @@ const ProblemView = () => {
         return(
         <div>
             <h2>{problem.title}</h2>
-            <p>Author: {problem.author}</p>
+            <p>Author: {problem.author.username}</p>
             <hr />
             <div>
                 <h4>Problem Statement</h4>

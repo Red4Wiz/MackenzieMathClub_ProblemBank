@@ -87,32 +87,58 @@ const ProblemEdit = () => {
   return (
     <div className="problem-form-container">
       <form onSubmit={handleSubmit} className="problem-form">
-        <h2>Edit Problem</h2>
-        <label>
-          Title:
-          <input type="text" name="title" value={problem.title || ''} onChange={(e) => setProblem({ ...problem, title: e.target.value })} />
-        </label>
-        <label>
-          Statement:
-          <MarkdownEditor value={problem.statement || ''} onChange={(val) => setProblem({ ...problem, statement: val })} markdownHeading={<h3>Preview</h3>} />
-        </label>
-        <label>
-          Solution:
-          <MarkdownEditor value={problem.solution || ''} onChange={(val) => setProblem({ ...problem, solution: val })} 
-            markdownHeading={<h3>Preview</h3>}/>
-        </label>
-        <label>
-          Problem Tags:
-          <Select isMulti name="problemTags" value={selectedPTags} onChange={setSelectedPTags} options={problemTags} />
-        </label>
-        <label>
-          Contest Tags:
-          <Select isMulti name="contestTags" value={selectedCTags} onChange={setSelectedCTags} options={contestTags} />
-        </label>
+        <label htmlFor="title">Title:</label>
+        <input
+          type="text"
+          id="title"
+          name="title"
+          value={problem.title || ''}
+          onChange={(e) => setProblem({ ...problem, title: e.target.value })}
+          className="input-text"
+        />
+  
+        <label htmlFor="statement">Statement:</label>
+        <MarkdownEditor
+          value={problem.statement || ''}
+          onChange={(val) => setProblem({ ...problem, statement: val })}
+          className="input-text"
+          markdownHeading={<h3>PREVIEW</h3>}
+        />
+  
+        <div className="line"></div>
+  
+        <label htmlFor="solution">Solution:</label>
+        <MarkdownEditor
+          value={problem.solution || ''}
+          onChange={(val) => setProblem({ ...problem, solution: val })}
+          className="input-text"
+          markdownHeading={<h3>PREVIEW</h3>}
+        />
+  
+        <div className="line"></div>
+  
+        <label htmlFor="problemTags">Problem Tags:</label>
+        <Select
+          isMulti
+          name="problemTags"
+          value={selectedPTags}
+          onChange={setSelectedPTags}
+          options={problemTags}
+        />
+  
+        <label htmlFor="contestTags">Contest Tags:</label>
+        <Select
+          isMulti
+          name="contestTags"
+          value={selectedCTags}
+          onChange={setSelectedCTags}
+          options={contestTags}
+        />
+  
         <button type="submit">Save</button>
       </form>
     </div>
-  );
+  );  
 };
 
 export default ProblemEdit;

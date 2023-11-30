@@ -1,0 +1,59 @@
+.contest-form-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    padding-top: 50px;
+    margin-bottom: 40px;
+  }
+  
+  .contest-form {
+    background-color: white;
+    width: 90%;
+    padding: 30px;
+    border: 2px solid black;
+    border-radius: 0;
+    box-shadow: none;
+    margin: 0 auto;
+    text-align: center;
+    max-width: 800px;
+  }
+  
+  .contest-form label {
+    display: block;
+    margin: 10px auto;
+    font-weight: bold;
+    text-align: left;
+  }
+  
+  .contest-form textarea,
+  .contest-form input {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid black;
+    box-sizing: border-box;
+    margin-bottom: 15px;
+  }
+  
+  .contest-form textarea {
+    height: 150px;
+  }
+  
+  .contest-form button {
+    background-color: black;
+    color: white;
+    font-weight: bold;
+    font-family: 'asap', sans-serif;
+    width: 100px;
+    margin-top: 20px;
+    padding: 10px;
+    cursor: pointer;
+  }
+  
+  .line {
+    width: 100%;
+    border-top: 1px solid #000;
+    margin: 10px auto;
+    margin-top: 20px;
+  }
+  

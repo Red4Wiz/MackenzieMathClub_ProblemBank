@@ -8,7 +8,7 @@ import ProblemForm from './ProblemForm';
 import { useNavigate } from 'react-router-dom';
 import ProblemView from './ProblemView';
 import ProblemEdit from './ProblemEdit';
-
+import ContestCreation from './ContestCreation';
 
 const App = () => {
   const [loggedIn, setLoggedIn] = useState(localStorage.getItem('token') ? true : false);
@@ -42,8 +42,12 @@ const App = () => {
           <div className="logging">
             {loggedIn ? (
               <>
+                
                 <Link to="/problem-form">
                   <button className="login-button">Create Problem</button>
+                </Link>
+                <Link to="/contest-creation">
+                  <button className="signup-button">Create Contest</button>
                 </Link>
                 <Link to="/">
                   <button className="signup-button">View Problems</button>
@@ -67,6 +71,7 @@ const App = () => {
           <Routes>
             <Route path="/" element={loggedIn ? <Hero /> : <Navigate to="/login" />} />
             <Route path="/problem-form" element={loggedIn ? <ProblemForm /> : <Navigate to="/login" />} />
+            <Route path="/contest-creation" element={loggedIn ? <ContestCreation /> : <Navigate to="/login" />} />
             <Route path="/problem-view/:id" element={loggedIn ? <ProblemView /> : <Navigate to="/login" />} />
             <Route path="/problem-edit/:id" element={loggedIn ? <ProblemEdit /> : <Navigate to="/login" />} />
             {!loggedIn ? (

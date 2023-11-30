@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@types/react-dnd": "^3.0.2",
+    "react-dnd": "^16.0.1"
+  }
+}

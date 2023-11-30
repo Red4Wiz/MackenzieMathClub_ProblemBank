@@ -15,17 +15,21 @@ const Hero = () => {
     axios.get('http://localhost:8080/problems', {'headers':{'Authorization': localStorage.getItem('token')}})
       .then((response) => {
         setProblemIds(response.data);
-        setProblems(new Array(response.data.length))
+        setProblems(response.data.map((el) => {
+          return {...el, ready: false}
+        }))
 
         // for each id, try filling in the current problem
         response.data.forEach((problem, ind) => {
           axios.get(`${ROUTES.api}/problem/get/${problem.id}`, {'headers': {'Authorization': localStorage.getItem('token')}})
           .then((res) => {
             if(res.status === 200){
-              const newProblems = [...problems]
-              newProblems[ind] = res.data
-              console.log(ind)
-              setProblems(newProblems)
+              setProblems((prev) => {
+                return prev.map((elem, ei) => {
+                  console.log(elem);
+                  return ei === ind ? {...res.data, ready: true} : elem
+                });
+              })
             }
           })
         })
@@ -36,24 +40,6 @@ const Hero = () => {
       });
   }, []);
 
-  const removeProblem = (id) => {
-    fetch(`${ROUTES.api}/problem/delete/${id}`, {
-      method: 'post', 
-      headers:{Authorization: localStorage.getItem('token')}
-    }).then((res) => {
-      if(res.status !== 200){
-        alert("error deleting");
-      } else {
-        window.location.reload(false);
-      }
-    })
-  }
-
-  const hFlex = {
-    display: 'flex',
-    flexDirection: 'row'
-  }
-
   return (
     <div className="hero-container">
       
@@ -61,7 +47,7 @@ const Hero = () => {
         {problems.map((problem) => (
             //links to the problem
             <div key={problem.id} className="problem-item problem-selectable" onClick={() => window.location = `/problem-view/${problem.id}`} style={{padding: '10px 20px'}}>
-              {!problem ? "Loading..." : 
+              {!problem.ready ? "Loading..." : 
                 <>
                   <ProblemTop problem={problem}></ProblemTop>
                   <div className='statement-desc' style={{height: '5em', overflow: 'hidden'}}>

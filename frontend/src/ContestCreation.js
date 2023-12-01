@@ -10,20 +10,45 @@ const ContestCreation = () => {
   const [contestTitle, setContestTitle] = useState('');
   const [availableProblems, setAvailableProblems] = useState([]);
   const [selectedProblems, setSelectedProblems] = useState([]);
+  const [problemDetails, setProblemDetails] = useState([]); // New state to store problem details
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get('http://localhost:8080/problems', {'headers':{'Authorization': localStorage.getItem('token')}}).then((response) => {
-      if(response.status === 200){
-        setAvailableProblems(response.data.map((el) => {
-          return {
-            label: el.title,
-            value: el.id
-          }
-        }));
-      }
-    })
+    axios.get('http://localhost:8080/problems', {'headers':{'Authorization': localStorage.getItem('token')}})
+      .then((response) => {
+        if(response.status === 200){
+          setAvailableProblems(response.data.map((el) => {
+            return {
+              label: el.title,
+              value: el.id
+            };
+          }));
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching problems: ', error.message);
+      });
   }, []);
+
+  useEffect(() => {
+    // Fetch problem details when selectedProblems change
+    const fetchProblemDetails = async () => {
+      const promises = selectedProblems.map((problem) =>
+        axios.get(`http://localhost:8080/api/problem/get/${problem.value}`, {'headers': {'Authorization': localStorage.getItem('token')}})
+      );
+
+      try {
+        const responses = await Promise.all(promises);
+        const problemDetailsData = responses.map((response) => response.data);
+        setProblemDetails(problemDetailsData);
+      } catch (error) {
+        console.error('Error fetching problem details: ', error.message);
+        // Handle error fetching problem details
+      }
+    };
+
+    fetchProblemDetails();
+  }, [selectedProblems]);
 
   const handleContestCreation = (e) => {
     e.preventDefault();
@@ -33,8 +58,10 @@ const ContestCreation = () => {
 
     pdf.setFontSize(12);
     selectedProblems.forEach((problem, index) => {
-      const yPos = 40 + index * 10; // adjusting y position
-      pdf.text(problem.label, 20, yPos);
+      const yPos = 40 + index * 30; // Adjust the y position as needed
+      pdf.text(`Problem Title: ${problem.label}`, 20, yPos);
+      pdf.text(`Problem Statement: ${problemDetails[index]?.statement || 'N/A'}`, 20, yPos + 10);
+      pdf.text(`Answer: ${problemDetails[index]?.solution || 'N/A'}`, 20, yPos + 20);
     });
 
     pdf.save('contest.pdf');
@@ -90,7 +117,8 @@ const ContestCreation = () => {
                         className="selected-problem"
                         style={{
                           ...provided.draggableProps.style,
-                          background: snapshot.isDragging ? 'lightblue' : 'white', margin: '8px',
+                          background: snapshot.isDragging ? 'lightblue' : 'white',
+                          margin: '8px',
                           padding: '8px',
                           border: '1px solid lightgray',
                           borderRadius: '4px',

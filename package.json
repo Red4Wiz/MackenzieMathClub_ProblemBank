@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "@types/react-dnd": "^3.0.2",
+    "latex2pdf": "^1.0.1",
     "react-dnd": "^16.0.1"
   }
 }

@@ -366,7 +366,7 @@ app.post('/signup', (req, res) => {
 
 //problems
 app.get('/problems', authenticateJWT, (req, res) => {
-  db.all('SELECT id, title FROM Problems', (err, rows) => {
+  db.all('SELECT id, title, statement, solution FROM Problems', (err, rows) => {
     if (err) {
       console.error('Error fetching problems:', err.message);
       res.status(500).json({ error: 'Internal server error' });

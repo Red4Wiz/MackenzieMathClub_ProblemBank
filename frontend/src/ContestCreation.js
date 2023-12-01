@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import './ContestCreation.css';
-import { ROUTES } from './routes.js';
 import Select from 'react-select';
 import { useNavigate } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import jsPDF from 'jspdf';
 
 const ContestCreation = () => {
   const [contestTitle, setContestTitle] = useState('');
-  const [contestBody, setContestBody] = useState('');
   const [availableProblems, setAvailableProblems] = useState([]);
   const [selectedProblems, setSelectedProblems] = useState([]);
   const navigate = useNavigate();
@@ -24,12 +23,21 @@ const ContestCreation = () => {
     setAvailableProblems(mockData.map((el) => ({ value: el.id, label: el.title })));
   }, []);
 
-  const handleContestCreation = () => {
-    // Placeholder function for contest creation logic
-    // Add your contest creation logic here
+  const handleContestCreation = (e) => {
+    e.preventDefault();
+    const pdf = new jsPDF();
+    pdf.setFontSize(18);
+    pdf.text(contestTitle, 20, 20);
+
+    pdf.setFontSize(12);
+    selectedProblems.forEach((problem, index) => {
+      const yPos = 40 + index * 10; // adjusting y position
+      pdf.text(problem.label, 20, yPos);
+    });
+
+    pdf.save('contest.pdf');
     console.log('Contest creation logic will be added here');
   };
-
 
   const onDragEnd = (result) => {
     if (!result.destination) {
@@ -51,6 +59,7 @@ const ContestCreation = () => {
           type="text"
           id="contestTitle"
           name="contestTitle"
+          value={contestTitle}
           onChange={(e) => setContestTitle(e.target.value)}
         />
 
@@ -63,7 +72,7 @@ const ContestCreation = () => {
               <div
                 {...provided.droppableProps}
                 ref={provided.innerRef}
-                style={{ display: 'flex', flexDirection: 'column', minHeight: '100px' }}
+                className="selected-problems-container"
               >
                 {selectedProblems.map((problem, index) => (
                   <Draggable
@@ -76,15 +85,13 @@ const ContestCreation = () => {
                         ref={provided.innerRef}
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
+                        className="selected-problem"
                         style={{
                           ...provided.draggableProps.style,
-                          margin: '8px',
+                          background: snapshot.isDragging ? 'lightblue' : 'white', margin: '8px',
                           padding: '8px',
                           border: '1px solid lightgray',
                           borderRadius: '4px',
-                          background: snapshot.isDragging ? 'lightblue' : 'white',
-                          transition: 'background 0.3s',
-                          zIndex: snapshot.isDragging ? 2 : 1,
                         }}
                       >
                         {problem.label}
@@ -105,9 +112,11 @@ const ContestCreation = () => {
           isMulti
           name="availableProblems"
           value={selectedProblems}
-          onChange={setSelectedProblems}
+          onChange={(selectedOptions) =>
+            setSelectedProblems(selectedOptions || []) // Handle null selectedOptions
+          }
           options={availableProblems}
-        ></Select>
+        />
 
         <button type="submit">Create Contest</button>
       </form>

@@ -4,6 +4,7 @@ import Select from 'react-select';
 import { useNavigate } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import jsPDF from 'jspdf';
+import axios from 'axios';
 
 const ContestCreation = () => {
   const [contestTitle, setContestTitle] = useState('');
@@ -12,15 +13,16 @@ const ContestCreation = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Mock data for available problems
-    const mockData = [
-      { id: 1, title: 'Problem 1' },
-      { id: 2, title: 'Problem 2' },
-      { id: 3, title: 'Problem 3' },
-      // Add more mock data as needed
-    ];
-
-    setAvailableProblems(mockData.map((el) => ({ value: el.id, label: el.title })));
+    axios.get('http://localhost:8080/problems', {'headers':{'Authorization': localStorage.getItem('token')}}).then((response) => {
+      if(response.status === 200){
+        setAvailableProblems(response.data.map((el) => {
+          return {
+            label: el.title,
+            value: el.id
+          }
+        }));
+      }
+    })
   }, []);
 
   const handleContestCreation = (e) => {

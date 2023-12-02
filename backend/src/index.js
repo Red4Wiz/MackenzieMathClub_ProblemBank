@@ -55,6 +55,18 @@ const authenticateJWT = (req, res, next) => {
     });
 };
 
+app.get('/api/verify', async (req, res) => {
+  const token = req.header('Authorization');
+
+  if(!token) res.send("fail")
+  else {
+    jwt.verify(token, SECRET_KEY, (err, user) => {
+      if(err) res.send("fail");
+      else res.send("success");
+    })
+  }
+})
+
 app.get("/api/problem/get/:id", authenticateJWT, async (req, res, next) => {
     try{
         // parse id

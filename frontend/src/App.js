@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link, Navigate } from 'react-router-dom';
 import './App.css';
 import LoginPage from './LoginPage';
@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import ProblemView from './ProblemView';
 import ProblemEdit from './ProblemEdit';
 import ContestCreation from './ContestCreation';
+import axios from 'axios';
 
 const App = () => {
   const [loggedIn, setLoggedIn] = useState(localStorage.getItem('token') ? true : false);
@@ -19,6 +20,18 @@ const App = () => {
     setLoggedIn(false);
     navigate('/login');
   };
+
+  useEffect(() => {
+    axios.get('http://localhost:8080/api/verify').then((res) => {
+      if(res.status !== 200){
+        setLoggedIn(false);
+      } else {
+        if(res.data !== "success"){
+          setLoggedIn(false);
+        }
+      }
+    })
+  }, [])
 
   return (
       <div className="app">

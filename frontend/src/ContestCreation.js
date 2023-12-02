@@ -3,8 +3,16 @@ import './ContestCreation.css';
 import Select from 'react-select';
 import { useNavigate } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import jsPDF from 'jspdf';
+import html2PDF from 'jspdf-html2canvas'
 import axios from 'axios';
+
+import rehypeKatex from 'rehype-katex'
+import rehypeStringify from 'rehype-stringify'
+import remarkMath from 'remark-math'
+import remarkParse from 'remark-parse'
+import remarkRehype from 'remark-rehype'
+import {unified} from 'unified'
+import {VFile} from 'vfile'
 
 const ContestCreation = () => {
   const [contestTitle, setContestTitle] = useState('');
@@ -30,6 +38,7 @@ const ContestCreation = () => {
       });
   }, []);
 
+
   useEffect(() => {
     // Fetch problem details when selectedProblems change
     const fetchProblemDetails = async () => {
@@ -52,20 +61,62 @@ const ContestCreation = () => {
 
   const handleContestCreation = (e) => {
     e.preventDefault();
-    const pdf = new jsPDF();
-    pdf.setFontSize(18);
-    pdf.text(contestTitle, 20, 20);
 
-    pdf.setFontSize(12);
-    selectedProblems.forEach((problem, index) => {
-      const yPos = 40 + index * 30; // Adjust the y position as needed
-      pdf.text(`Problem Title: ${problem.label}`, 20, yPos);
-      pdf.text(`Problem Statement: ${problemDetails[index]?.statement || 'N/A'}`, 20, yPos + 10);
-      pdf.text(`Answer: ${problemDetails[index]?.solution || 'N/A'}`, 20, yPos + 20);
-    });
+    const contentHTML = document.createElement('div')
 
-    pdf.save('contest.pdf');
-    console.log('Contest creation logic will be added here');
+    async function addElements() {
+      for(let index = 0; index < selectedProblems.length; index++){
+        const problem = selectedProblems[index]
+        const title = document.createElement('p')
+        title.innerHTML = `Problem Title: ${problem.label}`;
+        contentHTML.appendChild(title)
+
+        const statementTitle = document.createElement('p')
+        statementTitle.innerHTML = "Problem Statement:"
+        contentHTML.appendChild(statementTitle)
+
+        const statement = await unified()
+        .use(remarkParse)
+        .use(remarkMath)
+        .use(remarkRehype)
+        .use(rehypeKatex)
+        .use(rehypeStringify)
+        .process(new VFile(problemDetails[index]?.statement || 'N/A'))
+        const statementEl = document.createElement('div')
+        statementEl.innerHTML = String(statement)
+        contentHTML.appendChild(statementEl)
+
+        const answerTitle = document.createElement('p')
+        answerTitle.innerHTML = "Answer:"
+        contentHTML.appendChild(answerTitle)
+
+        const answer = await unified()
+        .use(remarkParse)
+        .use(remarkMath)
+        .use(remarkRehype)
+        .use(rehypeKatex)
+        .use(rehypeStringify)
+        .process(new VFile(problemDetails[index]?.solution || 'N/A'))
+        const answerEl = document.createElement('div')
+        answerEl.innerHTML = String(answer)
+        contentHTML.appendChild(answerEl)
+
+        contentHTML.appendChild(document.createElement("br"))
+      }
+
+      const pdfHTML = document.createElement("div")
+      const title = document.createElement("h2")
+      title.innerHTML = contestTitle
+      title.style = "width: 100%; textAlign: center"
+      pdfHTML.appendChild(title)
+      pdfHTML.appendChild(contentHTML)
+      pdfHTML.style = "width: 1000px; padding: 50px;"
+
+      document.body.appendChild(pdfHTML)
+      html2PDF(pdfHTML)
+    }
+
+    addElements()
   };
 
   const onDragEnd = (result) => {

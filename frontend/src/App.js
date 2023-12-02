@@ -22,7 +22,7 @@ const App = () => {
   };
 
   useEffect(() => {
-    axios.get('http://localhost:8080/api/verify').then((res) => {
+    axios.get('http://localhost:8080/api/verify', {'headers':{'Authorization': localStorage.getItem('token')}}).then((res) => {
       if(res.status !== 200){
         setLoggedIn(false);
       } else {

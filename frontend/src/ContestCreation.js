@@ -112,7 +112,6 @@ const ContestCreation = () => {
       pdfHTML.appendChild(contentHTML)
       pdfHTML.style = "width: 1000px; padding: 50px;"
 
-      document.body.appendChild(pdfHTML)
       html2PDF(pdfHTML)
     }
 
